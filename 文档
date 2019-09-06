@@ -1,0 +1,6 @@
+使用fullcalendar
+参考资料：
+官网：https://fullcalendar.io/
+FullCalendar中文文档：HTTPS：//www.helloweba.net/javascript/452.html
+功能：排班表横向是一个时间轴，纵向是排班人员或者是工作地点，表头选择按钮，可以通过日历选择查看某天排班时间，排班表默认不可编辑，点击编辑按钮，
+    摹更改编辑状态，编辑之后根据需求增添有效数据。
