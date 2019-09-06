@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+        <meta charset='utf-8' />
+        <link href='./fullcalendar-4.3.1/packages/core/main.css' rel='stylesheet' />
+        <!-- <link href='./fullcalendar-4.3.1/daygrid/main.css' rel='stylesheet' /> -->
+        <!-- <link href='./fullcalendar-4.3.1/packages/timegrid/main.css' rel='stylesheet' /> -->
+        <!-- <link href='./fullcalendar-4.3.1/packages/list/main.css' rel='stylesheet' /> -->
+        <link href='./fullcalendar-4.3.1/timeline/main.css' rel='stylesheet' />
+        <link href='./fullcalendar-4.3.1/resource-timeline/main.css' rel='stylesheet' />
+        <style>
+                .fc-cell-content{
+                        text-align: center;
+                }
+                .fc-highlight {
+                        background: red !important;
+                }
+                .fc-license-message {
+                        display: none !important;
+                }
+                body {
+                        margin: 0;
+                        padding: 0;
+                        font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+                        font-size: 14px;
+                }
+                .table-content{
+                        position:relative;
+                        padding-top:50px;
+                        min-width:1200px;
+                }
+                #calendar {
+                        /* max-width: 900px;
+                        margin: 50px auto; */
+                        overflow-x:auto;
+                        margin:20px 50px;
+                }
+               
+                .content {
+                        background: #ffffff;
+                        width: 500px;
+                        min-height: 600px;
+                        margin: 100px auto 0;
+                }
+                .bg {
+                        background: rgba(0, 0, 0, .5);
+                        position: fixed;
+                        top: 0;
+                        right: 0;
+                        left: 0;
+                        bottom: 0;
+                        z-index: 10;
+                        display: none;
+                }
+                .head{
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top:50px;
+                        padding: 10px 50px;
+                        position:absolute;
+                        top:0;
+                        left:0;
+                        right:0;
+                }
+                .head-item{
+                        display: flex;
+                }
+                .right-btn{
+                        padding:0 20px;
+                        border:1px solid #dddddd;
+                        border-radius: 2px;
+                        margin-right: 10px;
+                        line-height:40px;
+                        text-align:center;
+                }
+                #time{
+                        border:none;
+                        flex:1;
+                }
+                #time:focus{
+                        border:none !important;
+                }
+                .input{
+                        display: flex;
+                        align-items: center;
+                }
+                .rili-img{
+                        background: url("./img/rili.png") no-repeat;
+                        width:32px;
+                        height:32px;
+                }
+        </style>
+</head>
+
+<body>
+        <div class="table-content">
+                <div class="head">
+                        <div class="head-item head-left">
+                                <div class="right-btn" >ROOM</div>
+                                <div class="right-btn" >THERAPIST</div>
+                                <div class="right-btn input" >
+                                        <input type="text"  id="time">
+                                        <img class="rili-img" src="./img/rili.png">
+                                </div>
+                        </div>
+                        <div class="head-item head-right">
+                                <div class="right-btn" >新建</div>
+                                <div class="right-btn" onclick="bianjiBtn()" id="edit">编辑</div>
+                        </div>
+                </div>
+                <div id='calendar'></div>
+        </div>
+        
+       
+        <div class="bg" id="show-bg">
+                <div class="content">
+                        <div>开始时间 <span id="startTime"></span></div>
+                        <div>结束时间 <span id="endTime"></span></div>
+                        <div id="button" onclick="cancel()">确认</div>
+                </div>
+        </div>
+        <script src='./laydate/laydate.js'></script>
+        <script src='./fullcalendar-4.3.1/core/main.js'></script>
+        <script src='./fullcalendar-4.3.1/interaction/main.js'></script>
+        <script src='./fullcalendar-4.3.1/daygrid/main.js'></script>
+        <script src='./fullcalendar-4.3.1/packages/timegrid/main.js'></script>
+        <script src='./fullcalendar-4.3.1/packages/list/main.js'></script>
+        <script src='./fullcalendar-4.3.1/timeline/main.js'></script>
+        <script src='./fullcalendar-4.3.1/resource-common/main.js'></script>
+        <script src='./fullcalendar-4.3.1/resource-timeline/main.js'></script>
+        <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+       
+        <script>
+                var nowDay = new Date();
+                var month = nowDay.getMonth() + 1;
+                if (month < 10) {
+                        month = "0" + month
+                }
+                var day = nowDay.getDate()
+                if (day < 10) {
+                        day = "0" + day
+                }
+                var date = nowDay.getFullYear() + "-" + month + "-" + day
+                var isEdit = false;
+                 var dataArry = [
+                                { id: '1', resourceId: 'b',start: '2019-09-05T17:00:00', end: '2019-09-05T07:00:00', title: 'event 1'  },
+                                { id: '2', resourceId: 'a', start: '2019-09-05T05:00:00', end: '2019-08-07T22:00:00', title: 'event 2' },
+                                { id: '3', resourceId: 'd', start: "2019-09-05", end: "2019-09-05", title: 'event 3' },
+                                { id: '4', resourceId: 'e', start: "2019-09-05" + 'T03:00:00', end: '2019-09-05T08:00:00', title: 'event 4' },
+                                { id: '5', resourceId: 'f', start: "2019-09-05" + 'T00:30:00', end: '2019-09-05T02:30:00', title: 'event 5' },
+
+                        ]
+                        var leftArry = [
+                                { id: 'a', title: 'Auditorium A'},
+                                { id: 'b', title: 'Auditorium B',},
+                                { id: 'c', title: 'Auditorium C' },
+                                { id: 'e', title: 'Auditorium E' },
+                                { id: 'f', title: 'Auditorium F'},
+                                { id: 'g', title: 'Auditorium G' },
+                                { id: 'h', title: 'Auditorium H' },
+                                { id: 'i', title: 'Auditorium I' },
+                                { id: 'j', title: 'Auditorium J' },
+                                { id: 'k', title: 'Auditorium K' },
+                                { id: 'l', title: 'Auditorium L' },
+                                { id: 'm', title: 'Auditorium M' },
+                                { id: 'n', title: 'Auditorium N' },
+                                { id: 'o', title: 'Auditorium O' },
+                                { id: 'p', title: 'Auditorium P' },
+                                { id: 'q', title: 'Auditorium Q' },
+                                { id: 'r', title: 'Auditorium R' },
+                                { id: 's', title: 'Auditorium S' },
+                                { id: 't', title: 'Auditorium T' },
+                                { id: 'u', title: 'Auditorium U' },
+                                { id: 'v', title: 'Auditorium V' },
+                                { id: 'w', title: 'Auditorium W' },
+                                { id: 'x', title: 'Auditorium X' },
+                                { id: 'y', title: 'Auditorium Y' },
+                                { id: 'z', title: 'Auditorium Z' }
+                        ]
+                document.addEventListener('DOMContentLoaded', function () {
+                        initInfo();
+                });
+                $(function(){
+                        laydate.render({
+                                elem: '#time' ,//指定元素
+                                lang: 'en',
+                                btns:['now','confirm'],
+                                value:nowDay,
+                                done:function(formatTime,date){
+                                        console.log(formatTime)
+                                        date = formatTime
+                                        initInfo(date)
+                                }
+                        });
+                })
+                function initInfo(date){
+                        $("#calendar").html("")
+                        var calendarEl = document.getElementById('calendar');
+                        var calendar = new FullCalendar.Calendar(calendarEl, {
+                                plugins: ['interaction', 'dayGrid', 'timeGrid', 'list', 'resourceTimeline'],
+                                now: date,
+                                editable: false, //控制已有时间可拖拽
+                                aspectRatio: 2,
+                                height:800,//日历高度
+                                handleWindowResize:true,//是否随浏览器窗口大小变化而自动变化。
+                                windowResize: function(view) {
+                                        console.log('The calendar has adjusted to a window resize');
+                                },
+                                navLinks: true,//允许天/周名称是否可点击
+                                selectHelper: true,//是否允许拖动过程中绘制占位符
+                                selectable: true,//允许单击或拖动
+                                selectOverlap: true,//否允许用户选择事件占用的时间段
+                                slotDuration:"00:30:00",
+                                scrollTime: '00:00', // undo default 6am scrollTime
+                                eventColor:"green",//事件颜色
+                                resourceAreaWidth:"10%",//左侧边栏的宽度
+                                title:"",
+                                defaultDate: date,
+                                header: {
+                                        left: false,
+                                        center: "title",
+                                        right: false
+                                        // left: 'today prev,next',
+                                        // center: 'title',
+                                        // right: 'resourceTimelineDay,resourceTimelineThreeDays'
+                                },
+                                defaultView: 'resourceTimelineDay',
+                                views: {
+                                        resourceTimelineThreeDays: {
+                                                type: 'resourceTimeline',
+                                                duration: { days: 5 },
+                                                buttonText: '5 days'
+                                        }
+                                },
+                                resourceLabelText: 'Rooms',
+                                resources: leftArry,
+                                events: dataArry,
+                                // eventRender: function (event, element, view) {          //当Event对象开始渲染时触发  
+                                //         console.log("eventRender():" );
+                                //         console.log(dataArry)
+                                // },
+                                unselectAuto: true,
+                                selectOverlap: true,       //确定用户是否被允许选择被事件占用的时间段，默认true可占用时间段  
+                                //          selectConstraint : ,        //限制用户选择指定时间段的日程数据：an event ID, "businessHours", object  
+                                selectAllow: function (selectInfo) { //精确的编程控制用户可以选择的地方，返回true则表示可选择，false表示不可选择  
+                                        return isEdit;
+                                },
+                                select: function (start, end, jsEvent, view) {
+                                        console.log(start)
+                                        var startTime = start.startStr.split("+")[0]
+                                        var endTime = start.endStr.split("+")[0]
+                                        console.log(startTime)
+                                        console.log(endTime)
+                                        var newData = {
+                                                id: '6',
+                                                resourceId: 'f',
+                                                start: startTime,
+                                                end: endTime,
+                                                title: 'event 6'
+                                        }
+                                        var add = confirm("确认选中")
+                                        if (add) {
+                                                dataArry.push(newData)
+                                                $("#show-bg").show()
+                                                $("#startTime").html(startTime)
+                                                $("#endTime").html(endTime)
+                                        } else {
+                                                // reloadInfo();
+                                        }
+                                },
+                                eventClick:function(calEvent, jsEvent, view){
+                                        console.log("点击已有事件")
+                                        $("#show-bg").show()
+                                },
+                                eventDragStart: function (event, jsEvent, ui, view) {    //日程开始拖拽时触发  
+                                        console.log("eventDragStart():");
+                                },
+                                eventDragStop: function (event, jsEvent, ui, view) {     //日程拖拽停止时触发  
+                                        console.log("eventDragStop():");
+                                },
+                                eventDrop: function (info) { //已有事件拖拽事件
+                                        console.log("已有事件拖拽事件")
+                                },
+                                eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {    //日程大小调整完成并已经执行更新时触发  
+                                        console.log("日程大小调整完成并已经执行更新时触发  ");
+                                },
+                                viewRender: function (view, element) {
+                                        console.log("66666")
+                                },
+                                unselect: function (view, jsEvent) {//选择操作取消时触发  
+                                        console.log("↓↓↓unselect↓↓↓");
+                                        console.log("view:" + view);
+                                },
+                                loading: function (isLoading, view) { //视图数据加载中、加载完成触发  
+                                        console.log("↓↓↓loading↓↓↓");
+                                        if (isLoading == true) {
+                                                console.log("view:" + view + ",开始加载");
+                                        } else if (isLoading == false) {
+                                                console.log("view:" + view + ",加载完成");
+                                        } else {
+                                                console.log("view:" + view + ",除非天塌下来否则不会进这个分支");
+                                        }
+                                },
+                        });
+                        calendar.render();
+                       
+                }
+                function bianjiBtn(){//控制编辑按钮
+                        isEdit = !isEdit
+                        if(isEdit){
+                                $("#edit").html("取消编辑")
+                        }else{
+                                $("#edit").html("编辑")
+                        }
+                        initInfo();
+                }
+                function cancel() {
+                        $("#show-bg").hide()
+                        initInfo();
+                }
+              
+        </script>
+</body>
+
+</html>
